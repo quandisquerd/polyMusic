@@ -11,7 +11,7 @@ const albumApi = createApi({
     tagTypes: ['Album'],
     baseQuery: fetchBaseQuery({
         // baseUrl: import.meta.env.VITE_URL,
-        baseUrl: 'http://localhost:3000',
+        baseUrl: 'https://node-postgresql-api-lemon.vercel.app/api',
         fetchFn: async (...args) => {
             await pause(1000)
             return fetch(...args)

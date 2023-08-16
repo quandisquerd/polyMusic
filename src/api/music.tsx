@@ -5,12 +5,11 @@ const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST,PATCH,OPTIONS'
 }
-
 const musicApi = createApi({
     reducerPath: 'music',
     tagTypes: ['Music'],
     baseQuery: fetchBaseQuery({
-        baseUrl: `https://node-postgresql-api-lemon.vercel.app/api`,
+        baseUrl: import.meta.env.VITE_URL,
         fetchFn: async (...args) => {
             await pause(1000)
             return fetch(...args)
@@ -20,7 +19,7 @@ const musicApi = createApi({
         getMusic: builder.query({
             query: () => ({
                 url: `/musics`,
-                headers:headers,
+                headers: headers,
                 mode: 'cors',
             }),
             providesTags: ['Music'],

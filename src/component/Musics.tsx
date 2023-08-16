@@ -14,15 +14,15 @@ import "./css/slick.css"
 import "./css/slicknav.css"
 import "./css/style.css"
 import './music.css'
-import { Button, Skeleton } from 'antd';
+import { Button } from 'antd';
 import { Link } from 'react-router-dom';
-import React, { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause, faFastForward } from '@fortawesome/free-solid-svg-icons';
 const Musics = () => {
     const { data, isLoading } = useGetMusicQuery('')
     const [isPlaying, setIsPlaying] = useState(false);
-    const [currentPlayingIndex, setCurrentPlayingIndex] = useState(null); // State lưu index bài hát đang chạy
+    const [currentPlayingIndex, setCurrentPlayingIndex]: any = useState(null); // State lưu index bài hát đang chạy
     const [widthPercentages, setWidthPercentages] = useState<any>()
     const [giaytongs, setgiaytong] = useState(0)
     const [sec, setsec] = useState(0)
@@ -31,9 +31,23 @@ const Musics = () => {
     const [startmin, setstartmin] = useState(0)
     const [nameMusic, setnameMusic] = useState('')
     const [imageMusic, setimageMusic] = useState('')
-    const [currentTime, setCurrentTime] = useState(0)
     const [indexs, setindex] = useState(0)
     // Hàm để bắt đầu phát bài hát
+    const playNextTrack = () => {
+        const nextIndex = currentPlayingIndex + 1;
+        if (nextIndex < data?.data?.length) {
+            togglePlay(nextIndex);
+        }
+    };
+    useEffect(() => {
+        const audioElement: any = document.getElementById(`audio-${currentPlayingIndex}`);
+        if (audioElement) {
+            audioElement.addEventListener('ended', playNextTrack);
+            return () => {
+                audioElement.removeEventListener('ended', playNextTrack);
+            };
+        }
+    }, [currentPlayingIndex]);
     const togglePlay = (index: any) => {
         setindex(index)
         if (index === currentPlayingIndex) {
@@ -108,31 +122,6 @@ const Musics = () => {
         }
     }
 
-
-
-
-    const outerRef: any = useRef(null);
-    const [isDragging, setIsDragging] = useState(false);
-    const [widthPercentage, setWidthPercentage] = useState(50);
-    const handleMouseDown = (e: any) => {
-        setIsDragging(true);
-    };
-
-    const handleMouseMove = (e: any) => {
-        if (!isDragging) return;
-
-        const outerWidth = outerRef.current.offsetWidth;
-        const mouseX = e.clientX - outerRef.current.getBoundingClientRect().left;
-
-        const clampedWidth = Math.min(outerWidth, Math.max(0, mouseX));
-        const newPercentage = (clampedWidth / outerWidth) * 100;
-
-        setWidthPercentage(newPercentage);
-    };
-
-    const handleMouseUp = () => {
-        setIsDragging(false);
-    };
     return (
         <>
             <div className="music_area music_gallery" style={{ backgroundColor: 'rgb(29, 29, 40)' }}>
@@ -157,132 +146,132 @@ const Musics = () => {
                         <div className="bar10"></div>
                         <div className="bar11"></div>
                         <div className="bar12"></div>
-                    </div> 
-                     <h1 style={{paddingTop:'500px'}}></h1></>) : (data?.data?.map((data: any, index: any) => {
-                        const isCurrentPlaying = index === currentPlayingIndex;
-                        return (
-                            <>
-                                <div className="row align-items-center justify-content-center mb-20">
-                                    <div className="col-xl-10">
-                                        <div className="row align-items-center">
-                                            <div className="col-xl-9 col-md-9">
-                                                <div className="music_field">
-                                                    <div className="thumb">
-                                                        <img src={data.image} alt="" />
-                                                    </div>
-                                                    <div className="audio_name">
-                                                        <div className="name">
-                                                            <h4 style={{ color: 'white' }}>{data.name}</h4>
-                                                            <p>10 November, 2019</p>
+                    </div>
+                        <h1 style={{ paddingTop: '500px' }}></h1></>) : (data?.data?.map((data: any, index: any) => {
+                            const isCurrentPlaying = index === currentPlayingIndex;
+                            return (
+                                <>
+                                    <div className="row align-items-center justify-content-center mb-20">
+                                        <div className="col-xl-10">
+                                            <div className="row align-items-center">
+                                                <div className="col-xl-9 col-md-9">
+                                                    <div className="music_field">
+                                                        <div className="thumb">
+                                                            <img src={data.image} alt="" />
                                                         </div>
-                                                        <audio id={`audio-${index}`} preload="auto" onTimeUpdate={(event) => handleTimeUpdate(index, event, data.name, data.image)}>
-                                                            <source src={data.file} />
-                                                        </audio>
-                                                        <hr />
-                                                        {isCurrentPlaying && isPlaying ? <div className="loaders" style={{ marginBottom: '-30px' }}>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar yellow"></div>
-                                                            <div className="bar blue"></div>
-                                                            <div className="bar violet"></div>
-                                                            <div className="bar red"></div>
-                                                            <div className="bar orange"></div>
-                                                            <div className="bar blue"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar yellow"></div>
-                                                            <div className="bar red"></div>
-                                                            <div className="bar orange"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar yellow"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar blue"></div>
-                                                            <div className="bar violet"></div>
-                                                            <div className="bar blue"></div>
+                                                        <div className="audio_name">
+                                                            <div className="name">
+                                                                <h4 style={{ color: 'white' }}>{data.name}</h4>
+                                                                <p>10 November, 2019</p>
+                                                            </div>
+                                                            <audio id={`audio-${index}`} preload="auto" onTimeUpdate={(event) => handleTimeUpdate(index, event, data.name, data.image)}>
+                                                                <source src={data.file} />
+                                                            </audio>
+                                                            <hr />
+                                                            {isCurrentPlaying && isPlaying ? <div className="loaders" style={{ marginBottom: '-30px' }}>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar yellow"></div>
+                                                                <div className="bar blue"></div>
+                                                                <div className="bar violet"></div>
+                                                                <div className="bar red"></div>
+                                                                <div className="bar orange"></div>
+                                                                <div className="bar blue"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar yellow"></div>
+                                                                <div className="bar red"></div>
+                                                                <div className="bar orange"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar yellow"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar blue"></div>
+                                                                <div className="bar violet"></div>
+                                                                <div className="bar blue"></div>
 
-                                                            <div className="bar orange"></div>
-                                                            <div className="bar red"></div>
-                                                            <div className="bar orange"></div>
-                                                            <div className="bar yellow"></div>
-                                                            <div className="bar green"></div>
+                                                                <div className="bar orange"></div>
+                                                                <div className="bar red"></div>
+                                                                <div className="bar orange"></div>
+                                                                <div className="bar yellow"></div>
+                                                                <div className="bar green"></div>
 
-                                                            <div className="bar violet"></div>
-                                                            <div className="bar blue"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar yellow"></div>
-                                                            <div className="bar orange"></div>
-                                                            <div className="bar orange"></div>
-                                                            <div className="bar orange"></div>
-                                                            <div className="bar yellow"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar blue"></div>
-                                                            <div className="bar violet"></div>
-                                                            <div className="bar blue"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar blue"></div>
-                                                            <div className="bar yellow"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar orange"></div>
-                                                            <div className="bar blue"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar orange"></div>
-                                                            <div className="bar yellow"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar blue"></div>
-                                                            <div className="bar violet"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar yellow"></div>
-                                                            <div className="bar blue"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar yellow"></div>
-                                                            <div className="bar orange"></div>
-                                                            <div className="bar red"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar orange"></div>
-                                                            <div className="bar yellow"></div>
-                                                            <div className="bar green"></div>
-                                                            <div className="bar blue"></div>
-                                                            <div className="bar orange"></div>
-                                                        </div> : ""}
-                                                        {isCurrentPlaying ? <div className='tong' style={{ width: `${giaytongs}%`, height: '3px', backgroundColor: 'white', marginTop: '30px', position: 'relative', }}>
-                                                            <div style={{ width: `${widthPercentages}%`, height: '100%', backgroundColor: 'red', marginTop: '30px', position: 'relative', }}><div className="child"
-                                                                style={{
-                                                                    position: 'absolute', // Để có thể định vị phần tử con theo vị trí tuyệt đối
-                                                                    top: '-5px', // Điều chỉnh vị trí theo y (lên trên)
-                                                                    right: '0', // Điều chỉnh vị trí theo x (phải)
-                                                                    width: '10px', // Độ rộng của chấm đỏ
-                                                                    height: '10px', // Chiều cao của chấm đỏ
-                                                                    backgroundColor: 'bue',
-                                                                    borderRadius: '50%', // Để tạo hình tròn
-                                                                    display: 'none', // Ẩn ban đầu
-                                                                }}
-                                                            ></div> </div>
-                                                        </div> : <div style={{ width: `100%`, height: '3px', backgroundColor: 'white', marginTop: '30px' }}></div>}
-                                                        {isCurrentPlaying ? (<><span style={{ color: 'white' }}>{startmin} :{startsec}</span>  /</>) : ""} {isCurrentPlaying ? (<><span style={{ color: 'white' }}>{min} :{sec}</span></>) : ""}
+                                                                <div className="bar violet"></div>
+                                                                <div className="bar blue"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar yellow"></div>
+                                                                <div className="bar orange"></div>
+                                                                <div className="bar orange"></div>
+                                                                <div className="bar orange"></div>
+                                                                <div className="bar yellow"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar blue"></div>
+                                                                <div className="bar violet"></div>
+                                                                <div className="bar blue"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar blue"></div>
+                                                                <div className="bar yellow"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar orange"></div>
+                                                                <div className="bar blue"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar orange"></div>
+                                                                <div className="bar yellow"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar blue"></div>
+                                                                <div className="bar violet"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar yellow"></div>
+                                                                <div className="bar blue"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar yellow"></div>
+                                                                <div className="bar orange"></div>
+                                                                <div className="bar red"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar orange"></div>
+                                                                <div className="bar yellow"></div>
+                                                                <div className="bar green"></div>
+                                                                <div className="bar blue"></div>
+                                                                <div className="bar orange"></div>
+                                                            </div> : ""}
+                                                            {isCurrentPlaying ? <div className='tong' style={{ width: `${giaytongs}%`, height: '3px', backgroundColor: 'white', marginTop: '30px', position: 'relative', }}>
+                                                                <div style={{ width: `${widthPercentages}%`, height: '100%', backgroundColor: 'red', marginTop: '30px', position: 'relative', }}><div className="child"
+                                                                    style={{
+                                                                        position: 'absolute', // Để có thể định vị phần tử con theo vị trí tuyệt đối
+                                                                        top: '-5px', // Điều chỉnh vị trí theo y (lên trên)
+                                                                        right: '0', // Điều chỉnh vị trí theo x (phải)
+                                                                        width: '10px', // Độ rộng của chấm đỏ
+                                                                        height: '10px', // Chiều cao của chấm đỏ
+                                                                        backgroundColor: 'bue',
+                                                                        borderRadius: '50%', // Để tạo hình tròn
+                                                                        display: 'none', // Ẩn ban đầu
+                                                                    }}
+                                                                ></div> </div>
+                                                            </div> : <div style={{ width: `100%`, height: '3px', backgroundColor: 'white', marginTop: '30px' }}></div>}
+                                                            {isCurrentPlaying ? (<><span style={{ color: 'white' }}>{startmin} :{startsec}</span>  /</>) : ""} {isCurrentPlaying ? (<><span style={{ color: 'white' }}>{min} :{sec}</span></>) : ""}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div className="col-xl-3 col-md-3">
-                                                <div className="music_btn">
-                                                    <Button className="boxed-btn" style={{ height: '50px', width: '120px', backgroundColor: currentPlayingIndex === index && isPlaying ? 'red' : 'white' }} onClick={() => togglePlay(index)}>
-                                                        {isCurrentPlaying && isPlaying ? <FontAwesomeIcon color='white' icon={faPause} /> : <FontAwesomeIcon icon={faPlay} />}
-                                                    </Button>
-                                                    <h4> </h4>
-                                                    <Button className="boxed-btn" style={{ height: '50px', width: '120px' }}><Link to={`${data.id}`}>Detail</Link></Button>
+                                                <div className="col-xl-3 col-md-3">
+                                                    <div className="music_btn">
+                                                        <Button className="boxed-btn" style={{ height: '50px', width: '120px', backgroundColor: currentPlayingIndex === index && isPlaying ? 'red' : 'white' }} onClick={() => togglePlay(index)}>
+                                                            {isCurrentPlaying && isPlaying ? <FontAwesomeIcon color='white' icon={faPause} /> : <FontAwesomeIcon icon={faPlay} />}
+                                                        </Button>
+                                                        <h4> </h4>
+                                                        <Button className="boxed-btn" style={{ height: '50px', width: '120px' }}><Link to={`${data.id}`}>Detail</Link></Button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                </div>
-                                <br />
-                                <br />
-                                <hr style={{ backgroundColor: 'gray' }} />
-                                <br />
-                                <br />
-                            </>
-                        )
-                    }))}
+                                    </div>
+                                    <br />
+                                    <br />
+                                    <hr style={{ backgroundColor: 'gray' }} />
+                                    <br />
+                                    <br />
+                                </>
+                            )
+                        }))}
                 </div>
             </div>
             <div className="progress-bar-container" style={{ width: '100%', margin: '0px auto' }} >
@@ -292,14 +281,14 @@ const Musics = () => {
                     <div style={{
                         width: '110px', marginLeft: '20px', marginTop: '24px'
                     }}>
-                        <FontAwesomeIcon icon={faFastForward} flip="horizontal" style={{ marginRight: ' 20px', color: 'white' , width:'10%' }} onClick={() => handleFastForward(false)} />
+                        <FontAwesomeIcon icon={faFastForward} flip="horizontal" style={{ marginRight: ' 20px', color: 'white', width: '10%' }} onClick={() => handleFastForward(false)} />
 
-                        {isPlaying ? <FontAwesomeIcon color='white' icon={faPause} /> : <FontAwesomeIcon color='red' icon={faPlay} />}
+                        {isPlaying ? <FontAwesomeIcon color='white' icon={faPause} onClick={() => togglePlay(currentPlayingIndex)} /> : <FontAwesomeIcon color='red' icon={faPlay} onClick={() => togglePlay(currentPlayingIndex)} />}
 
                         <FontAwesomeIcon icon={faFastForward} style={{ marginLeft: '20px', color: 'white', width: '10%' }} onClick={() => handleFastForward(true)} />
                     </div>
                     <span style={{ color: 'red', marginTop: '27px', width: '40px', fontSize: '12px' }}>{startmin} :{startsec} </span>
-                    <div style={{ marginLeft: '15px', width: '60%', marginTop: '5px' }} className='outer' ref={outerRef}>
+                    <div style={{ marginLeft: '15px', width: '60%', marginTop: '5px' }} className='outer'>
                         <div style={{
                             width: `${giaytongs}%`,
                             height: '1px',
@@ -317,7 +306,7 @@ const Musics = () => {
                                 marginTop: '30px',
                                 position: 'relative',
                                 display: 'flex',
-                            }} onMouseDown={handleMouseDown}
+                            }}
                                 className="inner-div" >
 
                             </div>
